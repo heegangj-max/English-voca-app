@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>단어 암기장</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B84FF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="단어 암기장">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <header class="topbar">
+    <h1 id="pageTitle">단어 암기장</h1>
+    <button id="settingsBtn" class="icon-btn" aria-label="설정">
+      <svg viewBox="0 0 24 24" class="icon"><path d="M12 8.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM19.4 13a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1.04 1.56V19.5a2 2 0 11-4 0v-.09A1.7 1.7 0 008.96 17.86a1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.7 1.7 0 004.6 13.4 1.7 1.7 0 003.04 12.36H2.95a2 2 0 110-4h.09A1.7 1.7 0 004.6 7.32a1.7 1.7 0 00-.34-1.87l-.06-.06A2 2 0 107.03 2.56l.06.06A1.7 1.7 0 008.96 2.96a1.7 1.7 0 001.04-1.56V1.31a2 2 0 114 0v.09A1.7 1.7 0 0015.04 2.96a1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06A1.7 1.7 0 0019.4 7.32a1.7 1.7 0 001.56 1.04h.09a2 2 0 110 4h-.09A1.7 1.7 0 0019.4 13z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </button>
+  </header>
+
+  <main id="views">
+
+    <section id="view-home" class="view active">
+      <div class="hero-card">
+        <p class="hero-greeting" id="greetingText">안녕하세요!</p>
+        <p class="hero-sub">오늘도 단어 암기, 파이팅이에요</p>
+        <div class="hero-row">
+          <div class="hero-stat">
+            <span class="hero-num" id="streakNum">0</span>
+            <span class="hero-label">연속 학습일</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-num" id="dueTodayNum">0</span>
+            <span class="hero-label">오늘 복습할 단어</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="primary-btn" id="startReviewBtn">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+        오늘의 복습 시작하기
+      </button>
+
+      <div class="section-title">단원별 진도</div>
+      <div id="lessonProgressList" class="lesson-progress-list"></div>
+
+      <div class="section-title">빠른 이동</div>
+      <div class="quick-grid">
+        <button class="quick-card" data-goto="view-cards">
+          <svg viewBox="0 0 24 24" class="icon-lg"><rect x="5" y="4" width="14" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>카드 학습</span>
+        </button>
+        <button class="quick-card" data-goto="view-quiz">
+          <svg viewBox="0 0 24 24" class="icon-lg"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>테스트</span>
+        </button>
+        <button class="quick-card" data-goto="view-list">
+          <svg viewBox="0 0 24 24" class="icon-lg"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span>전체 단어장</span>
+        </button>
+        <button class="quick-card" data-goto="view-stats">
+          <svg viewBox="0 0 24 24" class="icon-lg"><path d="M5 20V10M12 20V4M19 20v-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span>통계</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="view-cards" class="view">
+      <div class="lesson-chip-row" id="cardLessonChips"></div>
+
+      <div class="card-mode-toggle" id="cardDirectionToggle">
+        <button class="seg active" data-dir="en2ko">영어 → 뜻</button>
+        <button class="seg" data-dir="ko2en">뜻 → 영어</button>
+      </div>
+
+      <div class="card-progress-row">
+        <span id="cardProgressText">0 / 0</span>
+        <div class="progress-bar"><div class="progress-fill" id="cardProgressFill"></div></div>
+      </div>
+
+      <div class="flip-stage" id="flipStage">
+        <div class="flip-card" id="flipCard">
+          <div class="flip-face flip-front">
+            <span class="face-tag" id="cardTagFront"></span>
+            <span class="face-pos" id="cardPosFront"></span>
+            <span class="face-word" id="cardWordFront">-</span>
+            <span class="face-hint">탭하거나 위로 스와이프해서 뜻 보기</span>
+          </div>
+          <div class="flip-face flip-back">
+            <span class="face-tag" id="cardTagBack"></span>
+            <span class="face-meaning" id="cardMeaningBack">-</span>
+            <span class="face-def" id="cardDefBack"></span>
+            <span class="face-example" id="cardExampleBack"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-tools-row">
+        <button class="tool-btn" id="cardSpeakBtn" aria-label="발음 듣기">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 010 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <button class="tool-btn" id="cardFavBtn" aria-label="즐겨찾기">
+          <svg viewBox="0 0 24 24" class="icon"><path id="favPath" d="M12 20s-7-4.35-9.5-8.5C.5 8 2.3 4.5 6 4.5c2 0 3.5 1.2 4.5 2.6a2 2 0 003 0C14.5 5.7 16 4.5 18 4.5c3.7 0 5.5 3.5 3.5 7C19.5 15.65 12 20 12 20z" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </button>
+        <button class="tool-btn" id="cardShuffleBtn" aria-label="섞기">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M4 6h3l9 12h4M4 18h3l3-4M16 6h4M16 18l4-4M16 6l4 4M20 14l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <div class="card-actions-row">
+        <button class="action-btn action-unknown" id="btnUnknown">
+          <span class="action-emoji">✕</span>모르겠어요
+        </button>
+        <button class="action-btn action-unsure" id="btnUnsure">
+          <span class="action-emoji">△</span>애매해요
+        </button>
+        <button class="action-btn action-known" id="btnKnown">
+          <span class="action-emoji">✓</span>외웠어요
+        </button>
+      </div>
+    </section>
+
+    <section id="view-quiz" class="view">
+      <div id="quizSetup">
+        <div class="section-title">테스트 유형 선택</div>
+        <div class="quiz-type-grid">
+          <button class="quiz-type-card active" data-type="mc-meaning">
+            <strong>객관식</strong>
+            <span>단어 보고 뜻 고르기</span>
+          </button>
+          <button class="quiz-type-card" data-type="mc-word">
+            <strong>객관식</strong>
+            <span>뜻 보고 단어 고르기</span>
+          </button>
+          <button class="quiz-type-card" data-type="spell">
+            <strong>철자 입력</strong>
+            <span>뜻 보고 영어 쓰기</span>
+          </button>
+          <button class="quiz-type-card" data-type="short">
+            <strong>주관식</strong>
+            <span>단어 보고 뜻 쓰기</span>
+          </button>
+        </div>
+        <div class="section-title">범위</div>
+        <div class="lesson-chip-row" id="quizLessonChips"></div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="quizWrongOnlyToggle">
+          <span>틀린 단어만 출제</span>
+        </label>
+        <button class="primary-btn" id="quizStartBtn">테스트 시작</button>
+      </div>
+
+      <div id="quizPlay" style="display:none;">
+        <div class="quiz-score-row">
+          <span id="quizScoreText">0 / 0</span>
+          <button class="tool-btn small" id="quizQuitBtn" aria-label="종료">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="quiz-question-card">
+          <span class="quiz-q-tag" id="quizQTag"></span>
+          <span class="quiz-q-text" id="quizQText">-</span>
+        </div>
+        <div id="quizAnswerArea"></div>
+        <button class="primary-btn" id="quizNextBtn" style="display:none;">다음 문제 →</button>
+      </div>
+
+      <div id="quizResult" style="display:none;">
+        <div class="hero-card">
+          <p class="hero-greeting">테스트 완료!</p>
+          <div class="hero-row">
+            <div class="hero-stat"><span class="hero-num" id="quizResultScore">0</span><span class="hero-label">정답</span></div>
+            <div class="hero-stat"><span class="hero-num" id="quizResultTotal">0</span><span class="hero-label">전체 문제</span></div>
+            <div class="hero-stat"><span class="hero-num" id="quizResultRate">0%</span><span class="hero-label">정답률</span></div>
+          </div>
+        </div>
+        <div id="quizWrongList" class="wrong-review-list"></div>
+        <button class="primary-btn" id="quizRestartBtn">다시 테스트하기</button>
+      </div>
+    </section>
+
+    <section id="view-list" class="view">
+      <div class="search-row">
+        <svg viewBox="0 0 24 24" class="icon search-icon"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M20 20l-4.3-4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input type="text" id="listSearch" placeholder="단어 또는 뜻 검색">
+      </div>
+      <div class="lesson-chip-row" id="listLessonChips"></div>
+      <div class="filter-pill-row">
+        <button class="filter-pill active" data-filter="all">전체</button>
+        <button class="filter-pill" data-filter="fav">즐겨찾기</button>
+        <button class="filter-pill" data-filter="wrong">틀린 단어</button>
+        <button class="filter-pill" data-filter="unknown">모르는 단어</button>
+      </div>
+      <div id="listBody" class="word-list"></div>
+    </section>
+
+    <section id="view-stats" class="view">
+      <div class="stat-grid">
+        <div class="stat-tile">
+          <span class="stat-tile-num" id="statTodayCount">0</span>
+          <span class="stat-tile-label">오늘 학습</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-tile-num" id="statTotalCount">0</span>
+          <span class="stat-tile-label">누적 학습</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-tile-num" id="statAccuracy">0%</span>
+          <span class="stat-tile-label">정답률</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-tile-num" id="statStreak">0</span>
+          <span class="stat-tile-label">연속 학습일</span>
+        </div>
+      </div>
+
+      <div class="section-title">단원별 암기율</div>
+      <div id="statLessonList" class="lesson-progress-list"></div>
+
+      <div class="section-title">전체 암기율</div>
+      <div class="big-ring-wrap">
+        <svg viewBox="0 0 120 120" class="ring-svg">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="var(--ring-track)" stroke-width="10"/>
+          <circle id="statRingCircle" cx="60" cy="60" r="52" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="ring-center">
+          <span id="statRingPct">0%</span>
+          <span class="ring-sub">암기 완료</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-settings" class="view">
+      <div class="section-title">화면</div>
+      <div class="settings-list">
+        <div class="settings-row">
+          <span>다크 모드</span>
+          <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="switch-track"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <span>시스템 설정 따르기</span>
+          <label class="switch">
+            <input type="checkbox" id="systemThemeToggle">
+            <span class="switch-track"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <span>발음 자동 재생</span>
+          <label class="switch">
+            <input type="checkbox" id="autoSpeakToggle">
+            <span class="switch-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="section-title">데이터</div>
+      <div class="settings-list">
+        <button class="settings-row settings-btn" id="backupBtn">
+          <span>데이터 백업 (내보내기)</span>
+          <svg viewBox="0 0 24 24" class="icon"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="settings-row settings-btn" id="restoreBtn">
+          <span>데이터 복원 (가져오기)</span>
+          <svg viewBox="0 0 24 24" class="icon"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <input type="file" id="restoreFileInput" accept="application/json" style="display:none;">
+        <button class="settings-row settings-btn danger" id="resetBtn">
+          <span>모든 학습 기록 초기화</span>
+          <svg viewBox="0 0 24 24" class="icon"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <div class="section-title">정보</div>
+      <p class="about-text">단어 암기장 · Lesson 05~08<br>340개 단어 · 에빙하우스 망각곡선 기반 자동 복습</p>
+    </section>
+
+  </main>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="tab-btn active" data-view="view-home">
+      <svg viewBox="0 0 24 24" class="icon"><path d="M4 11.5L12 4l8 7.5M6 10v9h5v-5h2v5h5v-9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <span>홈</span>
+    </button>
+    <button class="tab-btn" data-view="view-cards">
+      <svg viewBox="0 0 24 24" class="icon"><rect x="5" y="4" width="14" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>카드</span>
+    </button>
+    <button class="tab-btn" data-view="view-quiz">
+      <svg viewBox="0 0 24 24" class="icon"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>테스트</span>
+    </button>
+    <button class="tab-btn" data-view="view-list">
+      <svg viewBox="0 0 24 24" class="icon"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>단어장</span>
+    </button>
+    <button class="tab-btn" data-view="view-stats">
+      <svg viewBox="0 0 24 24" class="icon"><path d="M5 20V10M12 20V4M19 20v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>통계</span>
+    </button>
+  </nav>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div id="updateBanner" class="update-banner" hidden>
+  <span>새 버전이 준비됐어요.</span>
+  <button id="updateReloadBtn" type="button">지금 업데이트</button>
+</div>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+<script>
+  /* Service Worker 등록: 오프라인 캐싱 + 자동 업데이트 처리 */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("./service-worker.js")
+        .then((reg) => {
+          // 이미 대기 중인 새 버전이 있으면 즉시 알림
+          if (reg.waiting && navigator.serviceWorker.controller) {
+            window.dispatchEvent(new CustomEvent("sw-update-available", { detail: reg }));
+          }
+          reg.addEventListener("updatefound", () => {
+            const installing = reg.installing;
+            if (!installing) return;
+            installing.addEventListener("statechange", () => {
+              if (installing.state === "installed" && navigator.serviceWorker.controller) {
+                window.dispatchEvent(new CustomEvent("sw-update-available", { detail: reg }));
+              }
+            });
+          });
+          // 주기적으로 새 버전 확인 (앱이 오래 켜져 있을 때 대비)
+          setInterval(() => reg.update().catch(() => {}), 60 * 60 * 1000);
+        })
+        .catch((err) => console.warn("Service worker registration failed:", err));
+
+      let swRefreshed = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (swRefreshed) return;
+        swRefreshed = true;
+        window.location.reload();
+      });
+    });
+  }
+</script>
+</body>
+</html>
