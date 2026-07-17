@@ -11,6 +11,7 @@ LESSON_IDS.forEach((lid) => {
       id: lid + "::" + en,
       lesson: lid,
       en, ko, def: def || "", pos: pos || "", example: example || "",
+      num: WORDS.length + 1, // 단어장 전체 번호와 동일한 고정 순번 (05→06→07→08 순서)
     });
   });
 });
@@ -262,8 +263,9 @@ document.getElementById("cardDirectionToggle").addEventListener("click", (e) => 
 });
 
 function resetCardPool() {
-  const pool = WORDS.filter((w) => cardState.lessons.has(w.lesson));
-  cardState.pool = shuffle(pool);
+  // 단어장의 번호 순서(1, 2, 3 ...)와 동일하게, 섞지 않고 원래 순서대로 진행한다.
+  // (순서를 바꾸고 싶으면 카드 화면의 "섞기" 버튼을 사용)
+  cardState.pool = WORDS.filter((w) => cardState.lessons.has(w.lesson));
   cardState.idx = 0;
   cardState.flipped = false;
   renderCard();
@@ -290,6 +292,8 @@ function renderCard() {
   if (!w) {
     document.getElementById("cardWordFront").textContent = "완료!";
     document.getElementById("cardTagFront").textContent = "";
+    document.getElementById("cardNumFront").textContent = "";
+    document.getElementById("cardNumBack").textContent = "";
     document.getElementById("cardPosFront").style.display = "none";
     return;
   }
@@ -297,6 +301,8 @@ function renderCard() {
   const frontText = dir === "en2ko" ? w.en : w.ko.replace(/\([^)]*\)/g, "").split(/[;,]/)[0].trim();
   const backText = dir === "en2ko" ? w.ko : w.en;
 
+  document.getElementById("cardNumFront").textContent = "#" + w.num;
+  document.getElementById("cardNumBack").textContent = "#" + w.num;
   document.getElementById("cardTagFront").textContent = VOCAB_DATA[w.lesson].name;
   document.getElementById("cardPosFront").textContent = w.pos;
   document.getElementById("cardPosFront").style.display = w.pos ? "inline-block" : "none";
@@ -592,7 +598,7 @@ function renderList() {
       '<div class="wr-main"><div class="wr-en"></div><div class="wr-ko"></div></div>' +
       '<button class="wr-speak-btn" aria-label="발음"><svg viewBox="0 0 24 24" class="icon"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/></svg></button>' +
       '<button class="wr-fav-btn ' + (p && p.favorite ? "active" : "") + '" aria-label="즐겨찾기"><svg viewBox="0 0 24 24" class="icon"><path d="M12 20s-7-4.35-9.5-8.5C.5 8 2.3 4.5 6 4.5c2 0 3.5 1.2 4.5 2.6a2 2 0 003 0C14.5 5.7 16 4.5 18 4.5c3.7 0 5.5 3.5 3.5 7C19.5 15.65 12 20 12 20z" fill="' + (p && p.favorite ? "currentColor" : "none") + '" stroke="currentColor" stroke-width="1.4"/></svg></button>';
-    row.querySelector(".wr-num").textContent = i + 1 + ".";
+    row.querySelector(".wr-num").textContent = w.num + ".";
     const enEl = row.querySelector(".wr-en");
     enEl.textContent = w.en;
     if (w.pos) { const s = document.createElement("span"); s.className = "wr-pos"; s.textContent = w.pos; enEl.appendChild(s); }

@@ -89,12 +89,14 @@
       <div class="flip-stage" id="flipStage">
         <div class="flip-card" id="flipCard">
           <div class="flip-face flip-front">
+            <span class="face-num" id="cardNumFront"></span>
             <span class="face-tag" id="cardTagFront"></span>
             <span class="face-pos" id="cardPosFront"></span>
             <span class="face-word" id="cardWordFront">-</span>
             <span class="face-hint">탭하거나 위로 스와이프해서 뜻 보기</span>
           </div>
           <div class="flip-face flip-back">
+            <span class="face-num" id="cardNumBack"></span>
             <span class="face-tag" id="cardTagBack"></span>
             <span class="face-meaning" id="cardMeaningBack">-</span>
             <span class="face-def" id="cardDefBack"></span>
@@ -292,6 +294,10 @@
       <svg viewBox="0 0 24 24" class="icon"><path d="M4 11.5L12 4l8 7.5M6 10v9h5v-5h2v5h5v-9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
       <span>홈</span>
     </button>
+    <button class="tab-btn" data-view="view-list">
+      <svg viewBox="0 0 24 24" class="icon"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>단어장</span>
+    </button>
     <button class="tab-btn" data-view="view-cards">
       <svg viewBox="0 0 24 24" class="icon"><rect x="5" y="4" width="14" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       <span>카드</span>
@@ -299,10 +305,6 @@
     <button class="tab-btn" data-view="view-quiz">
       <svg viewBox="0 0 24 24" class="icon"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>테스트</span>
-    </button>
-    <button class="tab-btn" data-view="view-list">
-      <svg viewBox="0 0 24 24" class="icon"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span>단어장</span>
     </button>
     <button class="tab-btn" data-view="view-stats">
       <svg viewBox="0 0 24 24" class="icon"><path d="M5 20V10M12 20V4M19 20v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
