@@ -6,12 +6,15 @@
 const LESSON_IDS = Object.keys(VOCAB_DATA);
 const WORDS = [];
 LESSON_IDS.forEach((lid) => {
+  const lessonNo = parseInt(lid, 10);
+  let n = 0;
   VOCAB_DATA[lid].words.forEach(([en, ko, def, pos, example]) => {
+    n++;
     WORDS.push({
       id: lid + "::" + en,
       lesson: lid,
       en, ko, def: def || "", pos: pos || "", example: example || "",
-      num: WORDS.length + 1, // 단어장 전체 번호와 동일한 고정 순번 (05→06→07→08 순서)
+      num: lessonNo + "-" + n, // 단원별 번호 (예: 5-1, 5-2 ... 6-1, 6-2 ...)
     });
   });
 });
@@ -214,6 +217,9 @@ document.getElementById("startReviewBtn").addEventListener("click", () => {
   cardState.pool = todaysQueue();
   if (cardState.pool.length === 0) cardState.pool = shuffle(WORDS.slice());
   cardState.idx = 0;
+  cardState.weakOnly = false;
+  const weakToggle = document.getElementById("cardWeakOnlyToggle");
+  if (weakToggle) weakToggle.checked = false;
   showView("view-cards");
   setActiveLessonChips(cardChipsEl, new Set(LESSON_IDS));
   renderCard();
@@ -221,7 +227,7 @@ document.getElementById("startReviewBtn").addEventListener("click", () => {
 
 /* ---------- 7. 카드 학습 ---------- */
 const cardChipsEl = document.getElementById("cardLessonChips");
-let cardState = { lessons: new Set(LESSON_IDS), pool: [], idx: 0, direction: "en2ko", flipped: false };
+let cardState = { lessons: new Set(LESSON_IDS), pool: [], idx: 0, direction: "en2ko", flipped: false, weakOnly: false };
 
 function buildLessonChips(container, onChange) {
   container.innerHTML = "";
@@ -262,10 +268,23 @@ document.getElementById("cardDirectionToggle").addEventListener("click", (e) => 
   renderCard();
 });
 
+document.getElementById("cardWeakOnlyToggle").addEventListener("change", (e) => {
+  cardState.weakOnly = e.target.checked;
+  resetCardPool();
+});
+
 function resetCardPool() {
   // 단어장의 번호 순서(1, 2, 3 ...)와 동일하게, 섞지 않고 원래 순서대로 진행한다.
   // (순서를 바꾸고 싶으면 카드 화면의 "섞기" 버튼을 사용)
-  cardState.pool = WORDS.filter((w) => cardState.lessons.has(w.lesson));
+  // "애매해요·모르겠어요만 보기"가 켜져 있으면 그 두 상태의 단어만 남긴다.
+  cardState.pool = WORDS.filter((w) => {
+    if (!cardState.lessons.has(w.lesson)) return false;
+    if (cardState.weakOnly) {
+      const p = STATE.progress[w.id];
+      return !!p && (p.status === "unsure" || p.status === "unknown");
+    }
+    return true;
+  });
   cardState.idx = 0;
   cardState.flipped = false;
   renderCard();
@@ -290,7 +309,7 @@ function renderCard() {
 
   const w = currentCard();
   if (!w) {
-    document.getElementById("cardWordFront").textContent = "완료!";
+    document.getElementById("cardWordFront").textContent = cardState.weakOnly ? "애매해요·모르겠어요 단어를 모두 외웠어요! 🎉" : "완료!";
     document.getElementById("cardTagFront").textContent = "";
     document.getElementById("cardNumFront").textContent = "";
     document.getElementById("cardNumBack").textContent = "";
@@ -357,11 +376,18 @@ function advanceCard(action, exitClass) {
   const flipCard = document.getElementById("flipCard");
   flipCard.classList.add(exitClass);
   setTimeout(() => {
-    cardState.idx++;
     cardState.flipped = false;
-    if (cardState.idx >= cardState.pool.length) {
-      cardState.pool = cardState.pool.slice();
-      cardState.idx = cardState.pool.length;
+    if (cardState.weakOnly && action === "known") {
+      // "애매해요·모르겠어요만 보기" 모드에서는 외웠다고 표시한 단어를
+      // 이번 복습 세션 목록에서 바로 빼준다.
+      cardState.pool.splice(cardState.idx, 1);
+      if (cardState.idx >= cardState.pool.length) cardState.idx = Math.max(0, cardState.pool.length - 1);
+    } else {
+      cardState.idx++;
+      if (cardState.idx >= cardState.pool.length) {
+        cardState.pool = cardState.pool.slice();
+        cardState.idx = cardState.pool.length;
+      }
     }
     renderCard();
   }, 260);

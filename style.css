@@ -336,6 +336,7 @@ body {
 
 .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 14px; margin: 14px 2px 20px; color: var(--text-primary); }
 .checkbox-row input { width: 18px; height: 18px; accent-color: var(--accent); }
+.card-filter-row { margin: 2px 2px 14px; font-size: 13.5px; }
 
 .quiz-score-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
 .quiz-question-card {
