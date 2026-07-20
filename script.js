@@ -478,6 +478,7 @@ function renderQuizQuestion() {
   const nextBtn = document.getElementById("quizNextBtn");
   nextBtn.style.display = "none";
   area.innerHTML = "";
+  delete area.dataset.locked; // 이전 문제에서 잠긴 상태가 남아있으면 다음 문제의 객관식 클릭이 막히므로 초기화한다.
   document.getElementById("quizScoreText").textContent = quizState.score + " / " + quizState.idx + "  (" + Math.min(quizState.idx + 1, quizState.pool.length) + "/" + quizState.pool.length + ")";
 
   if (quizState.idx >= quizState.pool.length) { finishQuiz(); return; }
