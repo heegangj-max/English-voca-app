@@ -9,7 +9,7 @@
      사용자가 index.html의 업데이트 배너에서 "지금 업데이트"를 누르면
      SKIP_WAITING 메시지를 받아 즉시 활성화 + 페이지를 새로고침한다.
 */
-const CACHE_VERSION = "vocab-app-v2";
+const CACHE_VERSION = "vocab-app-v3";
 const ASSETS = [
   "./",
   "./index.html",
